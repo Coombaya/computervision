@@ -57,9 +57,7 @@ if __name__ == '__main__':
         vis = img.copy()
 
         b = cv2.getTrackbarPos('off/on/start', 'facedetect')
-        red=0
-        blue=0
-        green=0
+
         cnt=0
 
         if (b == 1):
@@ -68,28 +66,78 @@ if __name__ == '__main__':
             #print(rects[0][0],rects[0][1],rects[0][2],rects[0][3],"asdf")
             
         if (b == 2):
-            draw_rects(vis, rects, (0, 255, 0))
+            #draw_rects(vis, rects, (0, 255, 0))
             if(len(rects) != 0):
+                cnt=0
+                avgpic=[0,0,0]
+
+                for i in range(rects[0][1], rects[0][3]):
+                    for j in range(rects[0][0], rects[0][2]):
+
+                        red=vis[i,j,2]
+                        green=vis[i,j,1]
+                        blue=vis[i,j,0]
+                            
+                        #rgb=red+green+blue
+                        #print(red,green,blue,rgb)
+                           
+                        #print(vis[i,j])
+                        '''
+                        if(red > 0):
+                            red=red/rgb
+                            vis[i,j,2]=red
+                        else:
+                           vis[i,j,2]=0
+                        if(green > 0):
+                            green=green/rgb
+                            vis[i,j,1]=green
+                        else:
+                            vis[i,j,1]=0
+                        if(blue > 0):
+                            blue=blue/rgb
+                            vis[i,j,0]=blue
+                        else:
+                           vis[i,j,0]=0
+                           '''
+                        if(green>100):
+                           vis[i,j,1]=255
+                        if(red > 150):
+                           vis[i,j]=255
+                        else:
+                           vis[i,j]=0
+                           '''
+                        if():
+                            vis[i,j]=0
+                            '''
+                        #print(red+blue+green)
+                        
+                        '''
+                        avgpic[0]+=red
+                        avgpic[1]+=green
+                        avgpic[2]+=blue
+                        cnt+=1
+                        '''
+                print("asdfasdfasdf")
+                '''
+                r=avgpic[0]/cnt
+                g=avgpic[1]/cnt
+                b=avgpic[2]/cnt
+
+                print(r,g,b)'''
+                '''
                 for x1, y1, x2, y2 in rects:
                     for i in range(y1, y2):
                         for j in range(x1, x2):
-                            red=vis[i,j,2]
-                            green=vis[i,j,1]
-                            blue=vis[i,j,0]
-                            #print(vis[i,j])
-                            if(red > 20):
-                               vis[i,j,2]=red*255/(red+green+blue)
-                            else:
-                               vis[i,j,2]=0
-                            if(green > 20):
-                               vis[i,j,1]=green*255/(red+green+blue)
-                            else:
-                               vis[i,j,1]=0
-                            if(blue > 20):
-                               vis[i,j,0]=blue*255/(red+green+blue)
-                            else:
-                               vis[i,j,0]=0
-
+                            if vis[i,j,0] < 1.1*avgpic[0]:
+                                if vis[i,j,0] > 0.9*avgpic[0]:
+                                    vis[i,j]=255
+                            if vis[i,j,1] < 1.1*avgpic[1]:
+                                if vis[i,j,1] > 0.9*avgpic[1]:
+                                    vis[i,j]=255
+                            if vis[i,j,2] < 1.1*avgpic[2]:
+                                if vis[i,j,2] > 0.9*avgpic[2]:
+                                    vis[i,j]=255
+                                    '''
         cv2.imshow('facedetect', vis)
         
         if 0xFF & cv2.waitKey(5) == 27:
