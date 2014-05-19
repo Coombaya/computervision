@@ -99,7 +99,7 @@ if __name__ == '__main__':
                         else:
                            vis[i,j,0]=0
                            '''
-                        if(green>100):
+                        if(green<150):
                            vis[i,j,1]=255
                         if(red > 150):
                            vis[i,j]=255
@@ -117,7 +117,7 @@ if __name__ == '__main__':
                         avgpic[2]+=blue
                         cnt+=1
                         '''
-                print("asdfasdfasdf")
+                #print("asdfasdfasdf")
                 '''
                 r=avgpic[0]/cnt
                 g=avgpic[1]/cnt
