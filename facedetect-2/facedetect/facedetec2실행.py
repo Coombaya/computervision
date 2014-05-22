@@ -7,15 +7,16 @@ from video import create_capture
 import math
 
 def Gaussian1D(GD, mean_a, mean_b, var, num):
-    temp[256]
 
+    temp=[0]*256
+    
     for i in range(0,num):
         if i < mean_a:
-            temp[i] = math.exp(-1*(i-mean_a) * (i-mean_a)/var)
+            temp[i] = math.exp(-1*(i-mean_a) * (i-mean_a)/var) 
         elif (i >= mean_a) & (i <=mean_b):
             temp[i] = 1.0
         else:
-            temp[i] = math.exp(-1*(i-mean_a) * (i-mean_a)/var)
+            temp[i] = math.exp(-1*(i-mean_b) * (i-mean_b)/var) 
     
     min = 1.0
     max = 0.0
@@ -29,7 +30,7 @@ def Gaussian1D(GD, mean_a, mean_b, var, num):
     mag = max - min
 
     for i in range(0, num):
-        GD[i]=(((temp[i]-min)/mag)*255);
+        GD[i]= ((temp[i]-min)/mag)*255
  
 def nothing(*arg):
     pass
@@ -87,61 +88,91 @@ if __name__ == '__main__':
 
         if (b == 1):
             draw_rects(vis, rects, (0, 255, 0))
-            #print(rects)
-            #print(rects[0][0],rects[0][1],rects[0][2],rects[0][3],"asdf")
+            
             
         if (b == 2):
-            #draw_rects(vis, rects, (0, 255, 0))
             if(len(rects) != 0):
-                avgpic=[0,0,0]
                 rgb=100000000
+                redavg=0
+                greenavg=0
                 for i in range(rects[0][1], rects[0][3]):
                     for j in range(rects[0][0], rects[0][2]):
-
                         red=vis[i,j,2]
                         green=vis[i,j,1]
-                        blue=vis[i,j,0]
-                            
+                        blue=vis[i,j,0]         
                         rgb=red+green+blue
+                        
                         
                         if rgb <= 10:
                             vis[i,j] = 0
                         else:
                             if(red > 10):
-                                red=red*256/rgb
+                                red=red*255/rgb
+                                if(red >= 255):
+                                    red=255
+                                redavg=redavg+red
                                 #vis[i,j,2]=red
                             else:
                                vis[i,j,2]=0
                             if(green > 10):
-                                green=green*256/rgb
+                                green=green*255/rgb
+                                if(green >= 255):
+                                    green = 255
+                                greenavg=greenavg+green
                                 #vis[i,j,1]=green
                             else:
                                 vis[i,j,1]=0
+                                '''
                             if(blue > 10):
-                                blue=blue*256/rgb
-                                #vis[i,j,0]=blue
+                                blue*256/rgb
+                                vis[i,j,0]=blue
                             else:
                                vis[i,j,0]=0
-                            vis[i][j] = red * green / 255 ;
-                            #if(blue <100):
-                                #vis[i,j,1]=0
-                            '''
-                            if(green>150):
-                               vis[i,j,1]=255
-                            if(red > 100):
-                               vis[i,j]=255
-                            else:
-                               vis[i,j]=0
-                               '''
-                        '''
-                        if():
-                            vis[i,j]=0
-                            '''
-                        #print(red+blue+green)
+                           '''
+                pictotal=(rects[0][2] - rects[0][0])*(rects[0][3] - rects[0][1])
+                
+                redavg = redavg / pictotal
+                greenavg = greenavg / pictotal
+                #print(redavg,greenavg)
+
+                '''
+                for i in range(0, 256):
+                    if i <= 10:
+                        Lut_norR[i]=255
+                        Lut_norG[i]=255
+                    elif i <= 30:
+                        Lut_norR[i]=255
+                        Lut_norG[i]=255
+                    elif i <250:
+                        Lut_norR[i]=(256/(1+math.exp((i-113)/30)));
+                        Lut_norG[i]=(256/(1+math.exp((i-113)/30)));
+                    else:
+                        Lut_norR[i]=0
+                        Lut_norG[i]=0
+                 '''   
+                Lut_norR=[0]*256
+                Lut_norG=[0]*256
+
+                Gaussian1D(Lut_norR, redavg-70, redavg+10, 100, 255)
+                Gaussian1D(Lut_norG, greenavg-70, greenavg+10, 100, 255)
+                
+                for i in range(rects[0][1], rects[0][3]):
+                    for j in range(rects[0][0], rects[0][2]):
+                        #vis[i,j] = (Lut_norR[vis[i,j,0]] * Lut_norG[vis[i,j,1]])/255
+                        
+                        Lut = (Lut_norR[vis[i,j,0]] * Lut_norG[vis[i,j,1]])/255
+                        
+                        if Lut > 0.1:
+                            vis[i,j] = 255
+                        else:
+                            vis[i,j] = 0
+                            
                        
-                #print("asdfasdfasdf")
-        
-        
+                        #vis[i,j,0]=Lut_norR[vis[i,j,0]]
+                        #vis[i,j,1]=Lut_norG[vis[i,j,1]]
+                
+                      
+
         cv2.imshow('facedetect', vis)
         
         if 0xFF & cv2.waitKey(5) == 27:
